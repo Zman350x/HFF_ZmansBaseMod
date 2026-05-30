@@ -1,0 +1,15 @@
+<Project>
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFramework>net472</TargetFramework>
+    <RootNamespace>HffArchipelagoClient</RootNamespace>
+    <RootDir>$(MSBuildThisFileDirectory)..</RootDir>
+    <ResourceDir>$(RootDir)\resources</ResourceDir>
+    <SharedBuildDir>$(RootDir)\build</SharedBuildDir>
+    <OutputPath>$(SharedBuildDir)\bin\output\</OutputPath>
+    <BaseIntermediateOutputPath>$(SharedBuildDir)\obj\$(MSBuildProjectName)\$(Configuration)\</BaseIntermediateOutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <DebugSymbols>false</DebugSymbols>
+    <DebugType>none</DebugType>
+  </PropertyGroup>
+</Project>
