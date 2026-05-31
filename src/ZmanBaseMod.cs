@@ -100,7 +100,8 @@ namespace ZmanBase
             }, resHelp);
 
             string listResourcesHelp = "USAGE: list_resources <type>\r\n\r\n" +
-                "Lists the loaded resources of the provided type. The type string should be in the format required by `Type.GetType(string)` (ex. \"list_resources TMPro.TMP_FontAsset, Assembly-CSharp\").";
+                "Lists the loaded resources of the provided type. The type string should be in the format required by `Type.GetType(string)` (ex. \"list_resources TMPro.TMP_FontAsset, Assembly-CSharp\"). " +
+                "As the type string is case-sensitive, activating BIGS may be necessary.";
             Shell.RegisterCommand("list_resources", (string txt) =>
             {
                 if (txt is null)

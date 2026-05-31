@@ -4,9 +4,11 @@ debug:
 release:
 	msbuild -restore ZmanBaseMod.sln /property:Configuration="Release"
 
-run:
+copy:
 	-pkill Human
 	cp build/bin/output/ZmanBaseMod.dll ~/.steam/steam/steamapps/common/"Human Fall Flat"/BepInEx/plugins/ZmanBaseMod.dll
+
+run: copy
 	(steam steam://rungameid/477160 &)
 
 .PHONY: clean

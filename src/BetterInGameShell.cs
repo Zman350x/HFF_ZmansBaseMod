@@ -4,11 +4,16 @@ using System.Collections.Generic;
 
 namespace ZmanBase
 {
+    using UnityEngine;
     using HarmonyLib;
 
     internal static class BetterInGameShell
     {
         public static bool IsEnabled { get; private set; } = false;
+        public static List<string> CommandHistory { get; private set; } = new List<string>();
+
+        private static int historyIndex = 0;
+        private static Dictionary<int, string> partialCommands = new Dictionary<int, string>();
 
         // Apply shell modifications
         public static void Start()
@@ -27,7 +32,63 @@ namespace ZmanBase
             IsEnabled = false;
         }
 
+        private static string SaveCommand(string command)
+        {
+            historyIndex = CommandHistory.Count;
+            partialCommands.Clear();
+
+            if (string.IsNullOrEmpty(command))
+                return command;
+
+            if (char.IsWhiteSpace(command, 0))
+                return command.TrimStart();
+
+            if (CommandHistory.Count == 0 || command != CommandHistory[CommandHistory.Count - 1])
+            {
+                CommandHistory.Add(command);
+                ++historyIndex;
+            }
+            return command;
+        }
+
+        private static void ProcessKeystrokes(TMPro.TMP_InputField input)
+        {
+            if (Game.GetKeyDown(KeyCode.UpArrow))
+            {
+                if (historyIndex > 0)
+                {
+                    if (historyIndex == CommandHistory.Count || input.text != CommandHistory[historyIndex])
+                        partialCommands[historyIndex] = input.text;
+
+                    --historyIndex;
+
+                    string partialCommand;
+                    if (partialCommands.TryGetValue(historyIndex, out partialCommand))
+                        input.text = partialCommand;
+                    else
+                        input.text = CommandHistory[historyIndex];
+                }
+            }
+            if (Game.GetKeyDown(KeyCode.DownArrow))
+            {
+                if (historyIndex < CommandHistory.Count)
+                {
+                    if (historyIndex == CommandHistory.Count || input.text != CommandHistory[historyIndex])
+                        partialCommands[historyIndex] = input.text;
+
+                    ++historyIndex;
+
+                    string partialCommand;
+                    if (partialCommands.TryGetValue(historyIndex, out partialCommand))
+                        input.text = partialCommand;
+                    else
+                        input.text = CommandHistory[historyIndex];
+                }
+            }
+        }
+
         // Patch the Shell such that it doesn't force the input to be lowercase or trim off the whitespace
+        // Add support for command history
         [HarmonyPatch(typeof(Shell), "Update")]
         [HarmonyTranspiler]
         private static IEnumerable<CodeInstruction> ShellUpdateTranspiler(IEnumerable<CodeInstruction> instructions)
@@ -35,12 +96,25 @@ namespace ZmanBase
             CodeMatcher codeMatcher = new CodeMatcher(instructions);
 
             codeMatcher.MatchStartForward(
+                    new CodeMatch(OpCodes.Ldc_I4_S, (SByte) KeyCode.Return),
+                    new CodeMatch(OpCodes.Call, typeof(Game).GetMethod("GetKeyDown", new Type[] { typeof(KeyCode) }))
+                )
+                .SetAndAdvance(OpCodes.Ldarg_0, null) // For labeling purposes
+                .InsertAndAdvance(
+                    new CodeInstruction(OpCodes.Ldfld, typeof(Shell).GetField("input")),
+                    CodeInstruction.Call(typeof(BetterInGameShell), "ProcessKeystrokes", new Type[] { typeof(TMPro.TMP_InputField) }),
+                    new CodeInstruction(OpCodes.Ldc_I4_S, (SByte) KeyCode.Return) // What we replaced earlier for labeling purposes
+                );
+
+            codeMatcher.MatchStartForward(
                     new CodeMatch(OpCodes.Callvirt, AccessTools.Method(typeof(String), "Trim"))
                 ).RemoveInstruction();
 
             codeMatcher.MatchStartForward(
                     new CodeMatch(OpCodes.Callvirt, AccessTools.Method(typeof(String), "ToLowerInvariant"))
-                ).RemoveInstruction();
+                ).SetInstructionAndAdvance(
+                    CodeInstruction.Call(typeof(BetterInGameShell), "SaveCommand", new Type[] { typeof(string) })
+                );
 
             return codeMatcher.Instructions();
         }
