@@ -9,7 +9,7 @@ namespace ZmanBase
     using UnityEngine.Events;
     using UnityEngine.SceneManagement;
 
-    [BepInPlugin("top.zman350x.hff.zmanbase", "Zman's Human: Fall Flat Base Mod", "0.0.1")]
+    [BepInPlugin("top.zman350x.hff.zmanbase", "Zman's Human: Fall Flat Base Mod", "0.1.0")]
     [BepInProcess("Human.exe")]
     public sealed class ZmanBaseMod : BaseUnityPlugin
     {

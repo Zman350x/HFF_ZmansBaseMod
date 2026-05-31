@@ -3,9 +3,9 @@
 ## Done
  * Custom commands (resize and BIGS)
  * Menu buttons
+ * Text positioning
 
 ## TODO
- * Text positioning
  * BepInEx config management
  * Custom "empty" level loading (callbacks)
  * Language support

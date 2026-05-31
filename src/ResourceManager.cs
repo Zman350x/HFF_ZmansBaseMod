@@ -7,19 +7,19 @@ namespace ZmanBase
 
     public static class ResourceManager
     {
-        public struct HffFont
+        public class HffFont
         {
             public TMP_FontAsset asset;
             public Material material;
         }
 
-        public static HffFont menuFont;
-        public static HffFont goodDogFont;
-        public static HffFont bloggerSansBoldFont;
-        public static HffFont arialFont;
-        public static HffFont liberationSansFont;
-        public static HffFont xb1Ps4ControllerSymbolsFont;
-        public static HffFont nintendoControllerSymbolsFont;
+        public static HffFont menuFont = new HffFont();
+        public static HffFont goodDogFont = new HffFont();
+        public static HffFont bloggerSansBoldFont = new HffFont();
+        public static HffFont arialFont = new HffFont();
+        public static HffFont liberationSansFont = new HffFont();
+        public static HffFont xb1Ps4ControllerSymbolsFont = new HffFont();
+        public static HffFont nintendoControllerSymbolsFont = new HffFont();
 
         static ResourceManager()
         {
