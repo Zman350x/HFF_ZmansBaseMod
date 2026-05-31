@@ -28,4 +28,15 @@ namespace ZmanBase
             return Enum.GetValues(typeof(U)).Cast<U>().Select(i => this[i]).GetEnumerator();
         }
     }
+
+    public static class HelperFunctions
+    {
+        // From https://stackoverflow.com/a/2683487
+        public static T Clamp<T>(this T val, T min, T max) where T : IComparable<T>
+        {
+            if (val.CompareTo(min) < 0) return min;
+            else if(val.CompareTo(max) > 0) return max;
+            else return val;
+        }
+    }
 }

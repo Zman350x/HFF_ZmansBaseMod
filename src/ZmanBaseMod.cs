@@ -52,7 +52,7 @@ namespace ZmanBase
         {
             string scenesHelp = "USAGE: scenes\r\n\r\nList all scene paths";
             // List all Unity scene paths
-            Shell.RegisterCommand("scenes", (string txt) =>
+            Shell.RegisterCommand("scenes", () =>
             {
                 for(int i = 0; i < SceneManager.sceneCountInBuildSettings; i++)
                 {
