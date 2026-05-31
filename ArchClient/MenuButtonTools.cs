@@ -1,4 +1,6 @@
-namespace ZmanBase
+using System.Linq;
+
+namespace HffArchipelagoClient
 {
     using UnityEngine;
     using UnityEngine.UI;
@@ -49,8 +51,8 @@ namespace ZmanBase
             textContent.color = Color.black;
             textContent.fontSize = 40;
             textContent.fontSizeMax = 40;
-            textContent.font = ResourceManager.menuFont.asset;
-            textContent.fontMaterial = ResourceManager.menuFont.material;
+            textContent.font = ResourceManager.menuFont;
+            textContent.fontMaterial = ResourceManager.menuFontMaterial;
             textContent.enableWordWrapping = false;
             textContent.enableAutoSizing = true;
             textContent.enableKerning = false;

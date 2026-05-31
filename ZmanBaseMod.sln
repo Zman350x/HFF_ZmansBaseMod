@@ -1,9 +1,9 @@
-
+﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HffArchipelagoClient", "src\HffArchipelagoClient.csproj", "{D99FD72D-E67E-482B-BDFF-45E374251CCF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZmanBaseMod", "src\ZmanBaseMod.csproj", "{573B27C5-F498-44AF-966B-8AACF12ADB21}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -14,9 +14,9 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{D99FD72D-E67E-482B-BDFF-45E374251CCF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D99FD72D-E67E-482B-BDFF-45E374251CCF}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D99FD72D-E67E-482B-BDFF-45E374251CCF}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D99FD72D-E67E-482B-BDFF-45E374251CCF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{573B27C5-F498-44AF-966B-8AACF12ADB21}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{573B27C5-F498-44AF-966B-8AACF12ADB21}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{573B27C5-F498-44AF-966B-8AACF12ADB21}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{573B27C5-F498-44AF-966B-8AACF12ADB21}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

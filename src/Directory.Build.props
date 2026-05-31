@@ -2,7 +2,7 @@
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <TargetFramework>net472</TargetFramework>
-    <RootNamespace>HffArchipelagoClient</RootNamespace>
+    <RootNamespace>ZmanBase</RootNamespace>
     <RootDir>$(MSBuildThisFileDirectory)..</RootDir>
     <ResourceDir>$(RootDir)\resources</ResourceDir>
     <SharedBuildDir>$(RootDir)\build</SharedBuildDir>

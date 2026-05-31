@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <AssemblyName>HffArchipelagoClient</AssemblyName>
+    <AssemblyName>ZmanBaseMod</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="0Harmony" />
@@ -14,10 +14,5 @@
     <Reference Include="UnityEngine.UIModule" />
     <Reference Include="UnityEngine.PhysicsModule" />
     <Reference Include="UnityEngine.ImageConversionModule" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="$(ResourceDir)\archipelago" />
-    <EmbeddedResource Include="$(ResourceDir)\hub_world_thumbnail.png" />
-    <EmbeddedResource Include="$(ResourceDir)\lock.png" />
   </ItemGroup>
 </Project>

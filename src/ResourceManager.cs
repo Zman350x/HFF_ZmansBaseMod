@@ -1,65 +1,52 @@
 using System.Linq;
-using System.Reflection;
-using System.IO;
 
-namespace HffArchipelagoClient
+namespace ZmanBase
 {
     using UnityEngine;
     using TMPro;
 
     public static class ResourceManager
     {
-        public static GameObject PortalPrefab { get; private set; }
-        public static ComputeShader BoundsCompute { get; private set; }
+        public struct HffFont
+        {
+            public TMP_FontAsset asset;
+            public Material material;
+        }
 
-        public static TMP_FontAsset menuFont;
-        public static Material menuFontMaterial;
-
-        public static TMP_FontAsset goodDogFont;
-        public static Material goodDogFontMaterial;
-
-        public static Texture2D HubWorldThumbnail;
-        public static Texture2D LockTexture;
+        public static HffFont menuFont;
+        public static HffFont goodDogFont;
+        public static HffFont bloggerSansBoldFont;
+        public static HffFont arialFont;
+        public static HffFont liberationSansFont;
+        public static HffFont xb1Ps4ControllerSymbolsFont;
+        public static HffFont nintendoControllerSymbolsFont;
 
         static ResourceManager()
         {
-            // Load AssetBundle
-            string bundleName = Assembly.GetExecutingAssembly().GetManifestResourceNames().Single(str => str.EndsWith("archipelago"));
-            Stream bundleStream = Assembly.GetExecutingAssembly().GetManifestResourceStream(bundleName);
-            AssetBundle bundle = AssetBundle.LoadFromStream(bundleStream);
-
-            // AssetBundle Assets
-            bundle.LoadAsset<Shader>("assets/textmesh pro/required/shaders/tmp_sdf-surface.shader");
-            bundle.LoadAsset<Shader>("assets/shaders/screenspacecover.shader");
-            BoundsCompute = bundle.LoadAsset<ComputeShader>("assets/shaders/computebounds.compute");
-            goodDogFontMaterial = bundle.LoadAsset<Material>("assets/fonts/gooddog sdf.mat");
-            PortalPrefab = bundle.LoadAsset<GameObject>("assets/portal.prefab");
-
             // Fonts
             TMP_FontAsset[] fonts = Resources.FindObjectsOfTypeAll<TMP_FontAsset>();
             Material[] fontMaterials = Resources.FindObjectsOfTypeAll<Material>();
 
-            menuFont = fonts.Where(font => font.name == "Menu SDF").First();
-            menuFontMaterial = fontMaterials.Where(material => material.name == "Menu SDF Material").First();
-            goodDogFont = fonts.Where(font => font.name == "GoodDog SDF").First();
+            menuFont.asset = fonts.Where(font => font.name == "Menu SDF").First();
+            menuFont.material = fontMaterials.Where(material => material.name == "Menu SDF Material" && material.mainTexture.name == "Menu SDF Atlas").First(); // There are multiple "Menu SDF Material" resources
 
-            // Load Hub World Thumbnail
-            string hubWorldThumbnailName = Assembly.GetExecutingAssembly().GetManifestResourceNames().Single(str => str.EndsWith("hub_world_thumbnail.png"));
-            Stream hubWorldThumbnailStream = Assembly.GetExecutingAssembly().GetManifestResourceStream(hubWorldThumbnailName);
-            byte[] hubWorldThumbnailBytes = new byte[hubWorldThumbnailStream.Length];
-            hubWorldThumbnailStream.Read(hubWorldThumbnailBytes, 0, hubWorldThumbnailBytes.Length);
-            HubWorldThumbnail = new Texture2D(1, 1);
-            HubWorldThumbnail.LoadImage(hubWorldThumbnailBytes);
-            HubWorldThumbnail.name = "HubWorldThumbnail";
+            goodDogFont.asset = fonts.Where(font => font.name == "GoodDog SDF").First();
+            goodDogFont.material = fontMaterials.Where(material => material.name == "GoodDog Material").First();
 
-            // Load Hub Lock Texture
-            string lockTextureName = Assembly.GetExecutingAssembly().GetManifestResourceNames().Single(str => str.EndsWith("lock.png"));
-            Stream lockTextureStream = Assembly.GetExecutingAssembly().GetManifestResourceStream(lockTextureName);
-            byte[] lockTextureBytes = new byte[lockTextureStream.Length];
-            lockTextureStream.Read(lockTextureBytes, 0, lockTextureBytes.Length);
-            LockTexture = new Texture2D(1, 1);
-            LockTexture.LoadImage(lockTextureBytes);
-            LockTexture.name = "LockTexture";
+            bloggerSansBoldFont.asset = fonts.Where(font => font.name == "Blogger_Sans-Bold SDF").First();
+            bloggerSansBoldFont.material = fontMaterials.Where(material => material.name == "Blogger_Sans-Bold SDF Instruction").First();
+
+            arialFont.asset = fonts.Where(font => font.name == "ARIALUNI SDF").First();
+            arialFont.material = fontMaterials.Where(material => material.name == "ARIALUNI SDF Material").First();
+
+            liberationSansFont.asset = fonts.Where(font => font.name == "LiberationSans SDF").First();
+            liberationSansFont.material = fontMaterials.Where(material => material.name == "LiberationSans SDF Material").First();
+
+            xb1Ps4ControllerSymbolsFont.asset = fonts.Where(font => font.name == "XB1PS4JoypadsSDF").First();
+            xb1Ps4ControllerSymbolsFont.material = fontMaterials.Where(material => material.name == "XB1PS4JoypadsSDF Material").First();
+
+            nintendoControllerSymbolsFont.asset = fonts.Where(font => font.name == "nintendo_ext_LE_003 SDF").First();
+            nintendoControllerSymbolsFont.material = fontMaterials.Where(material => material.name == "nintendo_ext_LE_003 SDF Material").First();
         }
     }
 }

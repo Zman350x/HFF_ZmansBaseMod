@@ -1,2 +1,2 @@
-# Human: Fall Flat Archipelago Client
+# Zman's Human: Fall Flat Base Mod
 ## About
