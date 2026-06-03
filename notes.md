@@ -4,10 +4,10 @@
  * Custom commands (resize and BIGS)
  * Menu buttons
  * Text positioning
+ * Custom "empty" level loading (callbacks)
 
 ## TODO
  * BepInEx config management
- * Custom "empty" level loading (callbacks)
  * Language support
  * Notification queue
  * PLCC integration

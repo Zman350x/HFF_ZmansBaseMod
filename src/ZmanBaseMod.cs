@@ -6,15 +6,12 @@ namespace ZmanBase
     using BepInEx.Configuration;
     using HarmonyLib;
     using UnityEngine;
-    using UnityEngine.Events;
     using UnityEngine.SceneManagement;
 
     [BepInPlugin("top.zman350x.hff.zmanbase", "Zman's Human: Fall Flat Base Mod", "0.1.0")]
     [BepInProcess("Human.exe")]
     public sealed class ZmanBaseMod : BaseUnityPlugin
     {
-        public static ZmanBaseMod Instance { get; private set; }
-        public static UnityEvent StartupEvent { get; private set; }
         public static CommandRegistry Commands { get; private set; }
         public static Traverse SetResolution { get; private set; }
 
@@ -24,8 +21,6 @@ namespace ZmanBase
 
         private void Awake()
         {
-            Instance = this;
-            StartupEvent = new UnityEvent();
             Commands = (CommandRegistry) AccessTools.DeclaredField(typeof(Shell), "commands").GetValue(null);
 
             Logger = base.Logger;
@@ -35,7 +30,7 @@ namespace ZmanBase
                                                          false,
                                                          "Enables the better in-game shell");
 
-            SceneManager.sceneLoaded += OnSceneLoaded;
+            LoadingTools.Enable();
         }
 
         private void Start()
@@ -164,15 +159,5 @@ namespace ZmanBase
                 }
             }, useBigsHelp);
         }
-
-        private static void OnSceneLoaded(Scene scene, LoadSceneMode mode)
-        {
-            if (scene.path == "Assets/Scenes/Startup.unity")
-            {
-                StartupEvent.Invoke();
-                return;
-            }
-        }
-
     }
 }
