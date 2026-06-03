@@ -28,7 +28,7 @@ namespace ZmanBase
         // Returns the level number on success or 0 on failure
         public static ulong RegisterRuntimeLevel(Action levelCallback)
         {
-            for (ulong i = ulong.MaxValue - 1; i > unchecked ((ulong) long.MinValue); --i)
+            for (ulong i = ulong.MaxValue - 1; i > unchecked ((ulong) int.MinValue); --i)
             {
                 if (!runtimeLevels.ContainsKey(i))
                 {
@@ -101,14 +101,16 @@ namespace ZmanBase
             FieldInfo levelNumberField = AccessTools.GetDeclaredFields(originalMethod.DeclaringType).Single(field => field.Name.Contains("levelNumber"));
             FieldInfo levelTypeField = AccessTools.GetDeclaredFields(originalMethod.DeclaringType).Single(field => field.Name.Contains("levelType"));
 
-            // Replace "!= ulong.MaxValue" with "<= 0x8000000000000000UL" (negative if viewed as signed)
+            // Replace "!= ulong.MaxValue" with "<= 0xFFFFFFFF80000000UL" (negative if viewed as signed int32)
             // Normally the code adds a bundle exclusion for the main menu, which has a level number of `-1` (MaxValue when unsigned)
             // This just extends that exclusion so that custom runtime levels can have level numbers of other negative values
+            // Have to use the bound for an `int` instead of a `long` to be safe since the game casts it down to the smaller type in the `Game` class
+            // despite storing it as a ulong everywhere else
             codeMatcher.MatchEndForward(
                     new CodeMatch(OpCodes.Ldarg_0),
                     new CodeMatch(OpCodes.Ldfld, levelNumberField),
                     new CodeMatch(OpCodes.Ldc_I4_M1)
-                ).SetInstructionAndAdvance(new CodeInstruction(OpCodes.Ldc_I8, long.MinValue))
+                ).SetInstructionAndAdvance(new CodeInstruction(OpCodes.Ldc_I8, int.MinValue))
                 .RemoveInstruction() // There is an unneeded type conversion
                 .SetOpcodeAndAdvance(OpCodes.Cgt_Un);
 
