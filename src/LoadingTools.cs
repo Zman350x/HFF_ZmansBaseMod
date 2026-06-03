@@ -14,9 +14,9 @@ namespace ZmanBase
     {
         public static event Action StartupEvent;
         public const string emptySceneName = "Assets/Scenes/Empty.unity";
+        public static ulong loadingLevelNumber { get; private set; }
 
         private static Dictionary<ulong, Action> runtimeLevels = new Dictionary<ulong, Action>();
-        private static ulong loadingLevelNumber;
 
         public static void LoadLevel(WorkshopLevelMetadata levelData)
         {
