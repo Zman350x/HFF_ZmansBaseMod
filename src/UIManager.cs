@@ -61,7 +61,6 @@ namespace ZmanBase
                 textRect = gameObject.GetComponent<RectTransform>();
                 textRect.sizeDelta = Vector2.zero;
 
-
                 switch (corner)
                 {
                     case Corner.TOP_LEFT:

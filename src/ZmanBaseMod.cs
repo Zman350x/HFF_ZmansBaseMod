@@ -31,6 +31,7 @@ namespace ZmanBase
                                                          "Enables the better in-game shell");
 
             LevelTools.Enable();
+            LevelTools.StartupEvent += OnStartup;
         }
 
         private void Start()
@@ -41,6 +42,11 @@ namespace ZmanBase
                 BetterInGameShell.Start();
 
             RegisterCommands();
+        }
+
+        private void OnStartup()
+        {
+            ConfigMenu.Enable();
         }
 
         private void RegisterCommands()

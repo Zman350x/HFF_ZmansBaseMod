@@ -297,5 +297,17 @@ namespace ZmanBase
                     break;
             }
         }
+
+        public static void ResetRectTransform(RectTransform transform)
+        {
+                transform.localScale = Vector3.one;
+                transform.localPosition = Vector3.zero;
+                transform.localRotation = Quaternion.identity;
+                transform.anchoredPosition3D = Vector3.zero;
+                transform.anchorMin = Vector2.zero;
+                transform.anchorMax = Vector2.one;
+                transform.offsetMin = Vector2.zero;
+                transform.offsetMax = Vector2.zero;
+        }
     }
 }
