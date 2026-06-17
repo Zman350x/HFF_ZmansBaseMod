@@ -115,6 +115,7 @@ namespace ZmanBase
         public static ulong loadingLevelNumber { get; private set; }
 
         private static Dictionary<ulong, Action> runtimeLevels = new Dictionary<ulong, Action>();
+        private const ulong minRuntimeLevelIndex = unchecked ((ulong) (uint) int.MinValue); // Have to cast via uint to prevent sign extension
 
         public static void LoadLevel(WorkshopLevelMetadata levelData)
         {
@@ -126,7 +127,7 @@ namespace ZmanBase
         // Returns the level number on success or 0 on failure
         public static ulong RegisterRuntimeLevel(Action levelCallback)
         {
-            for (ulong i = ulong.MaxValue - 1; i > unchecked ((ulong) int.MinValue); --i)
+            for (ulong i = ulong.MaxValue - 1; i >= minRuntimeLevelIndex; --i)
             {
                 if (!runtimeLevels.ContainsKey(i))
                 {
@@ -200,7 +201,7 @@ namespace ZmanBase
             FieldInfo levelTypeField = AccessTools.GetDeclaredFields(originalMethod.DeclaringType).Single(field => field.Name.Contains("levelType"));
             FieldInfo gameInstanceField = AccessTools.GetDeclaredFields(originalMethod.DeclaringType).Single(field => field.Name.Contains("$this"));
 
-            // Replace "!= ulong.MaxValue" with "<= 0xFFFFFFFF80000000UL" (negative if viewed as signed int32)
+            // Replace "!= ulong.MaxValue" with "< 0x0000000080000000UL" (negative if viewed as signed int32)
             // Normally the code adds a bundle exclusion for the main menu, which has a level number of `-1` (MaxValue when unsigned)
             // This just extends that exclusion so that custom runtime levels can have level numbers of other negative values
             // Have to use the bound for an `int` instead of a `long` to be safe since the game casts it down to the smaller type in the `Game` class
@@ -209,9 +210,10 @@ namespace ZmanBase
                     new CodeMatch(OpCodes.Ldarg_0),
                     new CodeMatch(OpCodes.Ldfld, levelNumberField),
                     new CodeMatch(OpCodes.Ldc_I4_M1)
-                ).SetInstructionAndAdvance(new CodeInstruction(OpCodes.Ldc_I8, (Int64) int.MinValue))
+                ).SetInstructionAndAdvance(new CodeInstruction(OpCodes.Ldc_I8, (Int64) minRuntimeLevelIndex))
                 .RemoveInstruction() // There is an unneeded type conversion
-                .SetOpcodeAndAdvance(OpCodes.Cgt_Un);
+                .SetOpcodeAndAdvance(OpCodes.Clt_Un)
+                .RemoveInstructions(2); // The "!=" took 3 instructions, our "<" needs only one
 
             // Change the != to == to check when the level type is unspecified
             codeMatcher.Start().MatchEndForward(
