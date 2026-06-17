@@ -10,10 +10,108 @@ namespace ZmanBase
     using HumanAPI;
     using UnityEngine.SceneManagement;
 
-    public static class LoadingTools
+    public enum Levels
     {
+        // Main levels
+        MANSION = 0,
+        TRAIN = 1,
+        CARRY = 2,
+        MOUNTAIN = 3,
+        DEMOLITION = 4,
+        CASTLE = 5,
+        WATER = 6,
+        POWER_PLANT = 7,
+        AZTEC = 8,
+        DARK = 9,
+        STEAM = 10,
+        ICE = 11,
+        REPRISE = 12,
+        CREDITS = 13,
+
+        // Extra dreams
+        THERMAL = 16,
+        FACTORY = 17,
+        GOLF = 18,
+        CITY = 19,
+        FOREST = 20,
+        LABORATORY = 21,
+        LUMBER = 22,
+        RED_ROCK = 23,
+        TOWER = 24,
+        MINIATURE = 25,
+        COPPER_WORLD = 26,
+        PORT = 27,
+        // Port has two scenes, one unused
+        // Skipping 28 to keep in line with level numbers
+        UNDERWATER = 29,
+        DOCKYARD = 30,
+        MUSEUM = 31,
+        HIKE = 32,
+        CANDYLAND = 33,
+        TEST_CHAMBER = 34,
+        STEAMPUNK_PARTY = 35,
+        VIKING = 36,
+
+        // Lobbies
+        WORKSHOP_LOBBY = 64,
+        BOWLING_LOBBY = 65,
+        CHRISTMAS_LOBBY = 66,
+        LUNAR_LOBBY = 67,
+
+        // Useful non-level scenes
+        STARTUP = 128,
+        EMPTY = 129,
+        CUSTOMIZATION = 130
+    }
+
+    public static class LevelTools
+    {
+        public static readonly BiMap<Levels, string> levelScenes = new BiMap<Levels, string>()
+        {
+            { Levels.MANSION, "Assets/Scenes/Levels/Intro.unity" },
+            { Levels.TRAIN, "Assets/Scenes/Levels/Push.unity" },
+            { Levels.CARRY, "Assets/Scenes/Levels/Carry.unity" },
+            { Levels.MOUNTAIN, "Assets/Scenes/Levels/Climb.unity" },
+            { Levels.DEMOLITION, "Assets/Scenes/Levels/Break.unity" },
+            { Levels.CASTLE, "Assets/Scenes/Levels/Siege.unity" },
+            { Levels.WATER, "Assets/Scenes/Levels/River.unity" },
+            { Levels.POWER_PLANT, "Assets/Scenes/Levels/Power.unity" },
+            { Levels.AZTEC, "Assets/Scenes/Levels/Aztec.unity" },
+            { Levels.DARK, "Assets/Scenes/Levels/Halloween.unity" },
+            { Levels.STEAM, "Assets/Scenes/SteamExperimental/Steam_merged.unity" },
+            { Levels.ICE, "Assets/Scenes/Experiments/IceExperimental/Ice_merged.unity" },
+            { Levels.REPRISE, "Assets/Scenes/Levels/Intro_Reprise.unity" },
+            { Levels.CREDITS, "Assets/Scenes/Credits.unity" },
+            { Levels.THERMAL, "Assets/ContestLevels/ThermalAssets/Thermal.unity" },
+            { Levels.FACTORY, "Assets/ContestLevels/FactoryAssets/Factory.unity" },
+            { Levels.GOLF, "Assets/ContestLevels/GolfAssets/Golf.unity" },
+            { Levels.CITY, "Assets/ContestLevels/CityAssets/City.unity" },
+            { Levels.FOREST, "Assets/ContestLevels/ForestAssets/Forest.unity" },
+            { Levels.LABORATORY, "Assets/ContestLevels/LabAssets/Lab.unity" },
+            { Levels.LUMBER, "Assets/ContestLevels/LumberAssets/Lumber.unity" },
+            { Levels.RED_ROCK, "Assets/ContestLevels/RedRockAssets/RedRock.unity" },
+            { Levels.TOWER, "Assets/ContestLevels/TowerAssets/Tower.unity" },
+            { Levels.MINIATURE, "Assets/ContestLevels/MiniatureAssets/Miniature.unity" },
+            { Levels.COPPER_WORLD, "Assets/ContestLevels/CopperWorldAssets/CopperWorld.unity" },
+            { Levels.PORT, "Assets/ContestLevels/NavalAssests/Naval_Ben.unity" },
+            { Levels.UNDERWATER, "Assets/ContestLevels/UnderwaterAssets/OceanAdventure.unity" },
+            { Levels.DOCKYARD, "Assets/ContestLevels/DockyardAssets/Dockyard.unity" },
+            { Levels.MUSEUM, "Assets/ContestLevels/MuseumAssets/Museum.unity" },
+            { Levels.HIKE, "Assets/ContestLevels/HikeAssets/Scenes/Hike.unity" },
+            { Levels.CANDYLAND, "Assets/ContestLevels/CandylandAssets/Candyland.unity" },
+            { Levels.TEST_CHAMBER, "Assets/ContestLevels/FacilityAssets/Facility.unity" },
+            { Levels.STEAMPUNK_PARTY, "Assets/ContestLevels/Punk/SteamPunk.unity" },
+            { Levels.VIKING, "Assets/ContestLevels/VikingAssets/Viking.unity" },
+            { Levels.WORKSHOP_LOBBY, "Assets/WorkShop/Scenes/Levels/WorkshopLobby.unity" },
+            { Levels.BOWLING_LOBBY, "Assets/Scenes/Lobby.unity" },
+            { Levels.CHRISTMAS_LOBBY, "Assets/Scenes/Special/Xmas.unity" },
+            { Levels.LUNAR_LOBBY, "Assets/Scenes/Lobbies/Zodiac.unity" },
+            { Levels.STARTUP, "Assets/Scenes/Startup.unity" },
+            { Levels.EMPTY, "Assets/Scenes/Empty.unity" },
+            { Levels.CUSTOMIZATION, "Assets/Scenes/Customization.unity" }
+        };
+
         public static event Action StartupEvent;
-        public const string emptySceneName = "Assets/Scenes/Empty.unity";
         public static ulong loadingLevelNumber { get; private set; }
 
         private static Dictionary<ulong, Action> runtimeLevels = new Dictionary<ulong, Action>();
@@ -47,19 +145,19 @@ namespace ZmanBase
 
         internal static void Enable()
         {
-            Harmony.CreateAndPatchAll(typeof(LoadingTools), "LoadingTools");
+            Harmony.CreateAndPatchAll(typeof(LevelTools), "LevelTools");
             SceneManager.sceneLoaded += OnSceneLoaded;
         }
 
         internal static void Disable()
         {
-            Harmony.UnpatchID("LoadingTools");
+            Harmony.UnpatchID("LevelTools");
             SceneManager.sceneLoaded -= OnSceneLoaded;
         }
 
         private static void OnSceneLoaded(Scene scene, LoadSceneMode mode)
         {
-            if (scene.path == "Assets/Scenes/Startup.unity")
+            if (scene.path == levelScenes.Forward[Levels.STARTUP])
             {
                 StartupEvent?.Invoke();
                 return;
@@ -71,7 +169,7 @@ namespace ZmanBase
                 Multiplayer.MultiplayerLobbyController.instance.HideUI();
             }
 
-            if (scene.path == LoadingTools.emptySceneName &&
+            if (scene.path == levelScenes.Forward[Levels.EMPTY] &&
                 Game.instance.currentLevelType == WorkshopItemSource.NotSpecified &&
                 Multiplayer.App.state != Multiplayer.AppSate.Menu)
             {
@@ -92,14 +190,15 @@ namespace ZmanBase
 
         [HarmonyPatch(typeof(Game), "LoadLevel", MethodType.Enumerator)]
         [HarmonyTranspiler]
-        private static IEnumerable<CodeInstruction> GameLoadLevelMoveNext(IEnumerable<CodeInstruction> instructions, MethodBase originalMethod)
+        private static IEnumerable<CodeInstruction> GameLoadLevelMoveNext(IEnumerable<CodeInstruction> instructions, ILGenerator generator, MethodBase originalMethod)
         {
-            CodeMatcher codeMatcher = new CodeMatcher(instructions);
+            CodeMatcher codeMatcher = new CodeMatcher(instructions, generator);
 
             // Get access to the sceneName local variable
             FieldInfo sceneNameField = AccessTools.GetDeclaredFields(originalMethod.DeclaringType).Single(field => field.Name.Contains("<sceneName>"));
             FieldInfo levelNumberField = AccessTools.GetDeclaredFields(originalMethod.DeclaringType).Single(field => field.Name.Contains("levelNumber"));
             FieldInfo levelTypeField = AccessTools.GetDeclaredFields(originalMethod.DeclaringType).Single(field => field.Name.Contains("levelType"));
+            FieldInfo gameInstanceField = AccessTools.GetDeclaredFields(originalMethod.DeclaringType).Single(field => field.Name.Contains("$this"));
 
             // Replace "!= ulong.MaxValue" with "<= 0xFFFFFFFF80000000UL" (negative if viewed as signed int32)
             // Normally the code adds a bundle exclusion for the main menu, which has a level number of `-1` (MaxValue when unsigned)
@@ -110,7 +209,7 @@ namespace ZmanBase
                     new CodeMatch(OpCodes.Ldarg_0),
                     new CodeMatch(OpCodes.Ldfld, levelNumberField),
                     new CodeMatch(OpCodes.Ldc_I4_M1)
-                ).SetInstructionAndAdvance(new CodeInstruction(OpCodes.Ldc_I8, int.MinValue))
+                ).SetInstructionAndAdvance(new CodeInstruction(OpCodes.Ldc_I8, (Int64) int.MinValue))
                 .RemoveInstruction() // There is an unneeded type conversion
                 .SetOpcodeAndAdvance(OpCodes.Cgt_Un);
 
@@ -125,7 +224,7 @@ namespace ZmanBase
             // Set the scene name to empty if unspecified level type
             codeMatcher.InsertAndAdvance(
                     new CodeInstruction(OpCodes.Ldarg_0),
-                    new CodeInstruction(OpCodes.Ldstr, emptySceneName),
+                    new CodeInstruction(OpCodes.Ldstr, levelScenes.Forward[Levels.EMPTY]),
                     new CodeInstruction(OpCodes.Stfld, sceneNameField)
                 );
 
@@ -155,6 +254,33 @@ namespace ZmanBase
                     new CodeInstruction(OpCodes.Stfld, sceneNameField)
                 );
 
+            // Add check to fix not loading different level if they have the same level number
+            // Changes the line `if (this.currentLevelNumber != (int)levelNumber)` to `if (this.currentLevelNumber != (int)levelNumber || this.currentLevelType != levelType)`
+
+            // Find the if statement
+            codeMatcher.Start().MatchEndForward(
+                    new CodeMatch(OpCodes.Ldarg_0),
+                    new CodeMatch(OpCodes.Ldfld, gameInstanceField),
+                    new CodeMatch(OpCodes.Ldfld, typeof(Game).GetField("currentLevelNumber")),
+                    new CodeMatch(OpCodes.Ldarg_0),
+                    new CodeMatch(OpCodes.Ldfld, levelNumberField),
+                    new CodeMatch(OpCodes.Conv_I4),
+                    new CodeMatch(OpCodes.Beq)
+                );
+
+            // Add the new part
+            Label skipLoadingLabel = (Label) codeMatcher.Operand;
+            Label loadingLabel;
+            codeMatcher.CreateLabelAt(codeMatcher.Pos + 1, out loadingLabel).SetAndAdvance(OpCodes.Bne_Un, loadingLabel);
+            codeMatcher.InsertAndAdvance(
+                    new CodeInstruction(OpCodes.Ldarg_0),
+                    new CodeInstruction(OpCodes.Ldfld, gameInstanceField),
+                    new CodeInstruction(OpCodes.Ldfld, typeof(Game).GetField("currentLevelType")),
+                    new CodeInstruction(OpCodes.Ldarg_0),
+                    new CodeInstruction(OpCodes.Ldfld, levelTypeField),
+                    new CodeInstruction(OpCodes.Beq, skipLoadingLabel)
+                );
+
             return codeMatcher.Instructions();
         }
 
@@ -177,12 +303,12 @@ namespace ZmanBase
 
             // Only run on built-in level
             // Advancing past a `Ldarg_0` and adding one at the end so the labels line up
-            Label label2;
-            codeMatcher.CreateLabelAt(codeMatcher.Pos + 7, out label2);
+            Label label;
+            codeMatcher.CreateLabelAt(codeMatcher.Pos + 7, out label);
             codeMatcher.Advance(1).InsertAndAdvance(
                     new CodeInstruction(OpCodes.Ldfld, typeof(Game).GetField("currentLevelType")),
                     new CodeInstruction(OpCodes.Ldc_I4_0),
-                    new CodeInstruction(OpCodes.Bne_Un, label2),
+                    new CodeInstruction(OpCodes.Bne_Un, label),
                     new CodeInstruction(OpCodes.Ldarg_0)
                 );
 

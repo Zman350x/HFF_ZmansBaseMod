@@ -8,7 +8,7 @@ namespace ZmanBase
     using UnityEngine;
     using UnityEngine.SceneManagement;
 
-    [BepInPlugin("top.zman350x.hff.zmanbase", "Zman's Human: Fall Flat Base Mod", "0.1.0")]
+    [BepInPlugin("top.zman350x.hff.zmanbase", "Zman's Human: Fall Flat Base Mod", "0.2.0")]
     [BepInProcess("Human.exe")]
     public sealed class ZmanBaseMod : BaseUnityPlugin
     {
@@ -30,7 +30,7 @@ namespace ZmanBase
                                                          false,
                                                          "Enables the better in-game shell");
 
-            LoadingTools.Enable();
+            LevelTools.Enable();
         }
 
         private void Start()
@@ -113,6 +113,60 @@ namespace ZmanBase
                     Debug.Log(resource.ToString());
                 }
             }, listResourcesHelp);
+
+            string levelExtraHelp = "USAGE: level_extra <level> <checkpoint>\r\n\r\nLoad checkpoint at extra dream level <level> at checkpoint <checkpoint>. `le` for short.";
+            Action<string> levelExtraCommand = (string txt) =>
+            {
+                if (txt is null)
+                {
+                    Debug.LogError($"ERROR: Invalid number of arguments\r\n{levelExtraHelp}");
+                    return;
+                }
+
+                string[] args = txt.Trim().Split(' ');
+
+                try
+                {
+                    if (args.Length == 2)
+                    {
+                        int lvlNum = int.Parse(args[0]);
+                        int cpNum = int.Parse(args[1]);
+
+                        if (lvlNum < 0 || cpNum < 0 || lvlNum >= Game.instance.editorPickLevels.Length)
+                        {
+                            Debug.LogError($"ERROR: Invalid arguments\r\n{levelExtraHelp}");
+                            return;
+                        }
+
+                        if (Multiplayer.NetGame.isClient || Multiplayer.NetGame.isServer)
+                        {
+                            Debug.LogError($"ERROR: Cannot change the level in multiplayer");
+                            return;
+                        }
+
+                        if (Game.instance.currentLevelType == WorkshopItemSource.EditorPick && Game.instance.currentLevelNumber == lvlNum)
+                        {
+                            Game.instance.RestartCheckpoint(cpNum, 0);
+                        }
+                        else
+                        {
+                            Multiplayer.App.instance.LaunchSinglePlayer((ulong) lvlNum, WorkshopItemSource.EditorPick, cpNum, 0);
+                        }
+                    }
+                    else
+                    {
+                        Debug.LogError($"ERROR: Invalid number of arguments\r\n{levelExtraHelp}");
+                        return;
+                    }
+                }
+                catch (Exception e) when (e is FormatException || e is OverflowException || e is ArgumentNullException)
+                {
+                    Debug.LogError($"ERROR: Invalid arguments\r\n{levelExtraHelp}");
+                    return;
+                }
+            };
+            Shell.RegisterCommand("le", levelExtraCommand, null);
+		    Shell.RegisterCommand("level_extra", levelExtraCommand, levelExtraHelp);
 
             string echoHelp = "USAGE: echo [text]\r\n\r\nDisplay argument text";
             // Echos text
