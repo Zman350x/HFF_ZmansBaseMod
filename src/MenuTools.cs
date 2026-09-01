@@ -7,80 +7,161 @@ namespace ZmanBase
 
     public static class MenuTools
     {
-        public const float buttonAnchorVerticalOffset = 0.1043f; // Found via trial and error in-game
-
-        public static void AddButton(string menu, string name, string text, int order, UnityAction callback, bool isBuiltIn = true)
+        public class MenuButton
         {
-            GameObject menuRoot = GetMenuObjectByName(menu, isBuiltIn);
-            GameObject menuButtons = menuRoot.GetComponentInChildren<VerticalLayoutGroup>(true).gameObject;
-            GameObject button = new GameObject(name, typeof(RectTransform),
-                                                     typeof(CanvasRenderer),
-                                                     typeof(Image),
-                                                     typeof(Button),
-                                                     typeof(LayoutElement));
-
-            button.layer = LayerMask.NameToLayer("UI");
-            button.transform.SetParent(menuButtons.transform);
-            HelperFunctions.ResetRectTransform(button.transform as RectTransform);
-            button.GetComponent<LayoutElement>().preferredHeight = 70;
-            button.transform.SetSiblingIndex(order);
-
-            button.GetComponent<Button>().colors = new ColorBlock
+            public class CustomMenuButtonRef : MonoBehaviour
             {
-                normalColor = new Color(1.0f, 1.0f, 1.0f, 0.2549f),
-                highlightedColor = new Color(1.0f, 1.0f, 1.0f, 1.0f),
-                pressedColor = new Color(0.7843f, 0.7843f, 0.7843f, 1.0f),
-                disabledColor = new Color(0.7843f, 0.7843f, 0.7843f, 0.502f),
-                colorMultiplier = 1.0f,
-                fadeDuration = 0.1f
-            };
+                public MenuButton button;
+            }
 
-            button.GetComponent<Button>().onClick.AddListener(callback);
+            public readonly string name;
+            public readonly string text;
+            public readonly MenuTransition menu;
+            public readonly UnityAction callback;
 
-            GameObject buttonText = new GameObject("TextMeshPro Text", typeof(RectTransform),
-                                                                       typeof(CanvasRenderer),
-                                                                       typeof(TextMeshProUGUI));
+            private readonly GameObject buttonParent;
+            private GameObject buttonObject;
 
-            buttonText.layer = LayerMask.NameToLayer("UI");
+            public MenuButton(string menu, string name, string text, UnityAction callback, bool isBuiltIn = true)
+            {
+                GameObject menuRoot = GetMenuObjectByName(menu, isBuiltIn);
+                this.menu = menuRoot.GetComponent<MenuTransition>();
 
-            RectTransform textRect = buttonText.transform as RectTransform;
-            textRect.SetParent(button.transform);
-            HelperFunctions.ResetRectTransform(textRect);
-            textRect.offsetMax = new Vector2(-20.0f, 0.0f);
-            textRect.offsetMin = new Vector2(20.0f, 0.0f);
+                this.name = name;
+                this.text = text;
+                this.callback = callback;
 
-            TextMeshProUGUI textContent = buttonText.GetComponent<TextMeshProUGUI>();
-            textContent.color = Color.black;
-            textContent.fontSize = 40;
-            textContent.fontSizeMax = 40;
-            textContent.font = ResourceManager.menuFont.asset;
-            textContent.fontMaterial = ResourceManager.menuFont.material;
-            textContent.enableWordWrapping = false;
-            textContent.enableAutoSizing = true;
-            textContent.enableKerning = false;
-            textContent.alignment = TextAlignmentOptions.Left;
-            textContent.text = text;
+                this.buttonParent = menuRoot.GetComponentInChildren<VerticalLayoutGroup>(true).gameObject;
+
+                this.buttonObject = null;
+            }
+
+            public MenuButton(MenuTransition menu, string name, string text, UnityAction callback)
+            {
+                this.menu = menu;
+                this.name = name;
+                this.text = text;
+                this.callback = callback;
+
+                this.buttonParent = menu.gameObject.GetComponentInChildren<VerticalLayoutGroup>(true).gameObject;
+
+                this.buttonObject = null;
+            }
+
+            public void Create(int order)
+            {
+                if (!(buttonObject is null))
+                    return;
+
+                buttonObject = new GameObject(name, typeof(RectTransform),
+                                                    typeof(CanvasRenderer),
+                                                    typeof(Image),
+                                                    typeof(Button),
+                                                    typeof(CustomMenuButtonRef),
+                                                    typeof(LayoutElement));
+
+                buttonObject.layer = LayerMask.NameToLayer("UI");
+                buttonObject.transform.SetParent(buttonParent.transform);
+                HelperFunctions.ResetRectTransform(buttonObject.transform as RectTransform);
+                buttonObject.GetComponent<LayoutElement>().preferredHeight = 70;
+                buttonObject.transform.SetSiblingIndex(order);
+
+                buttonObject.GetComponent<Button>().colors = new ColorBlock
+                {
+                    normalColor = new Color(1.0f, 1.0f, 1.0f, 0.2549f),
+                    highlightedColor = new Color(1.0f, 1.0f, 1.0f, 1.0f),
+                    pressedColor = new Color(0.7843f, 0.7843f, 0.7843f, 1.0f),
+                    disabledColor = new Color(0.7843f, 0.7843f, 0.7843f, 0.502f),
+                    colorMultiplier = 1.0f,
+                    fadeDuration = 0.1f
+                };
+
+                buttonObject.GetComponent<Button>().onClick.AddListener(callback);
+                buttonObject.GetComponent<CustomMenuButtonRef>().button = this;
+
+                GameObject buttonText = new GameObject("TextMeshPro Text", typeof(RectTransform),
+                                                                           typeof(CanvasRenderer),
+                                                                           typeof(TextMeshProUGUI));
+
+                buttonText.layer = LayerMask.NameToLayer("UI");
+
+                RectTransform textRect = buttonText.transform as RectTransform;
+                textRect.SetParent(buttonObject.transform);
+                HelperFunctions.ResetRectTransform(textRect);
+                textRect.offsetMax = new Vector2(-20.0f, 0.0f);
+                textRect.offsetMin = new Vector2(20.0f, 0.0f);
+
+                TextMeshProUGUI textContent = buttonText.GetComponent<TextMeshProUGUI>();
+                textContent.color = Color.black;
+                textContent.fontSize = 40;
+                textContent.fontSizeMax = 40;
+                textContent.font = ResourceManager.menuFont.asset;
+                textContent.fontMaterial = ResourceManager.menuFont.material;
+                textContent.enableWordWrapping = false;
+                textContent.enableAutoSizing = true;
+                textContent.enableKerning = false;
+                textContent.alignment = TextAlignmentOptions.Left;
+                textContent.text = text;
+            }
+
+            public void Destroy()
+            {
+                GameObject.Destroy(buttonObject);
+                buttonObject = null;
+            }
+
+            public void EnableDisable(bool enable)
+            {
+                buttonObject.SetActive(enable);
+            }
         }
 
-        public static void DestroyButton(string menu, string name, bool isBuiltIn = true)
+        public const float buttonAnchorVerticalOffset = 0.1043f; // Found via trial and error in-game
+
+        public static MenuButton AddButton(MenuTransition menu, string name, string text, int order, UnityAction callback)
         {
-            GameObject menuRoot = GetMenuObjectByName(menu, isBuiltIn);
-            GameObject menuButtons = menuRoot.GetComponentInChildren<VerticalLayoutGroup>(true).gameObject;
+            MenuButton button = new MenuButton(menu, name, text, callback);
+            button.Create(order);
+
+            return button;
+        }
+
+        public static MenuButton AddButton(string menu, string name, string text, int order, UnityAction callback, bool isBuiltIn = true)
+        {
+            MenuButton button = new MenuButton(menu, name, text, callback, isBuiltIn);
+            button.Create(order);
+
+            return button;
+        }
+
+        public static void DestroyButton(MenuTransition menu, string name)
+        {
+            GameObject menuButtons = menu.gameObject.GetComponentInChildren<VerticalLayoutGroup>(true).gameObject;
 
             foreach (Transform child in menuButtons.transform)
             {
                 if (child.name == name)
                 {
-                    GameObject.Destroy(child.gameObject);
+                    MenuButton.CustomMenuButtonRef customButton = child.gameObject.GetComponent<MenuButton.CustomMenuButtonRef>();
+
+                    if (!(customButton is null))
+                        customButton.button.Destroy();
+                    else
+                        GameObject.Destroy(child.gameObject);
+
                     return;
                 }
             }
         }
 
-        public static void EnableDisableButton(string menu, string name, bool enable, bool isBuiltIn = true)
+        public static void DestroyButton(string menu, string name, bool isBuiltIn = true)
         {
-            GameObject menuRoot = GetMenuObjectByName(menu, isBuiltIn);
-            GameObject menuButtons = menuRoot.GetComponentInChildren<VerticalLayoutGroup>(true).gameObject;
+            DestroyButton(GetMenuObjectByName(menu, isBuiltIn).GetComponent<MenuTransition>(), name);
+        }
+
+        public static void EnableDisableButton(MenuTransition menu, string name, bool enable)
+        {
+            GameObject menuButtons = menu.gameObject.GetComponentInChildren<VerticalLayoutGroup>(true).gameObject;
 
             foreach (Transform child in menuButtons.transform)
             {
@@ -92,10 +173,14 @@ namespace ZmanBase
             }
         }
 
-        public static void MoveButtons(string menu, float xOffset, float yOffset, bool isBuiltIn = true)
+        public static void EnableDisableButton(string menu, string name, bool enable, bool isBuiltIn = true)
         {
-            GameObject menuRoot = GetMenuObjectByName(menu, isBuiltIn);
-            GameObject menuButtons = menuRoot.GetComponentInChildren<VerticalLayoutGroup>(true).gameObject;
+            EnableDisableButton(GetMenuObjectByName(menu, isBuiltIn).GetComponent<MenuTransition>(), name, enable);
+        }
+
+        public static void MoveButtons(MenuTransition menu, float xOffset, float yOffset)
+        {
+            GameObject menuButtons = menu.gameObject.GetComponentInChildren<VerticalLayoutGroup>(true).gameObject;
 
             RectTransform transform = menuButtons.transform as RectTransform;
             if (transform is null)
@@ -104,6 +189,11 @@ namespace ZmanBase
             Vector2 offset = new Vector2(xOffset, yOffset);
             transform.anchorMax += offset;
             transform.anchorMin += offset;
+        }
+
+        public static void MoveButtons(string menu, float xOffset, float yOffset, bool isBuiltIn = true)
+        {
+            MoveButtons(GetMenuObjectByName(menu, isBuiltIn).GetComponent<MenuTransition>(), xOffset, yOffset);
         }
 
         public static void TransitionForward(MenuTransition from, MenuTransition to, float fadeOutTime = 0.3f, float fadeInTime = 0.3f)
@@ -130,6 +220,7 @@ namespace ZmanBase
             public bool blurBackground;
 
             public GameObject menuObject;
+            public MenuButton backButton;
 
             public override void ApplyMenuEffects()
             {
@@ -163,7 +254,7 @@ namespace ZmanBase
                 canvas.additionalShaderChannels = AdditionalCanvasShaderChannels.TexCoord1 |
                                                   AdditionalCanvasShaderChannels.Normal |
                                                   AdditionalCanvasShaderChannels.Tangent;
-                
+
                 menuObject.GetComponent<AutoNavigation>().direction = NavigationDirection.Vertical;
 
                 GameObject menuPanel = new GameObject("MenuPanel", typeof(RectTransform));
@@ -181,7 +272,7 @@ namespace ZmanBase
                 RectTransform titleTransform = titleObject.transform as RectTransform;
                 titleTransform.SetParent(panelTransform);
                 HelperFunctions.ResetRectTransform(titleTransform);
-                
+
                 TextMeshProUGUI titleContent = titleObject.GetComponent<TextMeshProUGUI>();
                 titleContent.color = Color.white;
                 titleContent.fontSize = 80;
@@ -193,7 +284,7 @@ namespace ZmanBase
                 titleContent.enableKerning = false;
                 titleContent.alignment = TextAlignmentOptions.TopLeft;
                 titleContent.text = title;
-                
+
                 GameObject buttons = new GameObject("Buttons", typeof(RectTransform),
                                                                typeof(VerticalLayoutGroup),
                                                                typeof(ContentSizeFitter));
@@ -205,8 +296,9 @@ namespace ZmanBase
                 buttonTransform.anchorMin = new Vector2(0.0f, 0.6f);
 
                 buttons.GetComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+                buttons.GetComponent<VerticalLayoutGroup>().spacing = 20;
 
-                AddButton(name, "BackButton", "BACK", 100, menu.BackClick, false);
+                menu.backButton = AddButton(name, "BackButton", "BACK", 0, menu.BackClick, false);
 
                 return menu;
             }

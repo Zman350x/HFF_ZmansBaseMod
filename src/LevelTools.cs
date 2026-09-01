@@ -51,6 +51,7 @@ namespace ZmanBase
         TEST_CHAMBER = 34,
         STEAMPUNK_PARTY = 35,
         VIKING = 36,
+        ANNIVERSARY = 37,
 
         // Lobbies
         WORKSHOP_LOBBY = 64,
@@ -102,6 +103,7 @@ namespace ZmanBase
             { Levels.TEST_CHAMBER, "Assets/ContestLevels/FacilityAssets/Facility.unity" },
             { Levels.STEAMPUNK_PARTY, "Assets/ContestLevels/Punk/SteamPunk.unity" },
             { Levels.VIKING, "Assets/ContestLevels/VikingAssets/Viking.unity" },
+            { Levels.ANNIVERSARY, "Assets/ContestLevels/AnniversaryAssets/Anniversary.unity" },
             { Levels.WORKSHOP_LOBBY, "Assets/WorkShop/Scenes/Levels/WorkshopLobby.unity" },
             { Levels.BOWLING_LOBBY, "Assets/Scenes/Lobby.unity" },
             { Levels.CHRISTMAS_LOBBY, "Assets/Scenes/Special/Xmas.unity" },

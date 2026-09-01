@@ -19,6 +19,8 @@ namespace ZmanBase
 
         private ConfigEntry<bool> betterInGameShellEnabled;
 
+        private ConfigMenu baseModConfigMenu;
+
         private void Awake()
         {
             Commands = (CommandRegistry) AccessTools.DeclaredField(typeof(Shell), "commands").GetValue(null);
@@ -29,6 +31,8 @@ namespace ZmanBase
                                                          "Enabled",
                                                          false,
                                                          "Enables the better in-game shell");
+
+            baseModConfigMenu = new ConfigMenu("ZmanBaseMod", "Zman's Base Mod", "ZMAN'S BASE MOD");
 
             LevelTools.Enable();
             LevelTools.StartupEvent += OnStartup;
